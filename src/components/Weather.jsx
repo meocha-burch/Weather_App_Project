@@ -11,7 +11,8 @@ import wind_icon from '../assets/wind.png';
 
 const Weather = () => {
   
-    const inputRef = useRef();
+    const cityRef = useRef();
+    const stateRef = useRef();
     const [weatherData, setWeatherData] = useState ({
       humidity: null,
       windSpeed: null,
@@ -37,18 +38,24 @@ const Weather = () => {
       "13n": snow_icon,
     };
 
-    const search = async (city) => {
-      if(!city.trim()) {
+    const search = async () => {
+      const city = cityRef.current.value.trim();
+      const state = stateRef.current.value.trim();
+
+      if(!city) {
         alert("Enter City Name");
         return;
       }
+
+      const query = state ? `${city},${state},US` : city;
+
       try {
-          const url =`https://api.openweathermap.org/data/2.5/weather?q=${city}&units=imperial&appid=${import.meta.env.VITE_APP_ID}`;
+          const url =`https://api.openweathermap.org/data/2.5/weather?q=${query}&units=imperial&appid=${import.meta.env.VITE_APP_ID}`;
           const response = await fetch(url);
           const data = await response.json();
 
           if(data.cod !== 200){
-            alert(data.message || "Invalid city name");
+            alert(data.message || "Invalid city or state");
           }
 
           console.log(data);
@@ -59,7 +66,7 @@ const Weather = () => {
             humidity: data.main?.humidity ?? "N/A",
             windSpeed: data.wind?.speed ?? "N/A",
             temperature: data.main?.temp ? Math.floor(data.main.temp) : "N/A",
-            location: data.name || "Unknown Location",
+            location: `${data.name}, ${data.sys?.state || data.sys?.country}`,
             icon: icon
           });
 
@@ -70,27 +77,20 @@ const Weather = () => {
       }
     };
 
-    useEffect(()=> {
-      search("New Jersey");
+    useEffect(() => {
+      cityRef.current.value = "Newark";
+      stateRef.current.value = "NJ";
+      search();
     }, []);
+  
 
   return (
     <div className ="weather">
       <div className ="search-bar">
-        <input 
-        ref={inputRef} 
-        type ="text" 
-        placeholder="Enter a City Name"
-        onKeyDown={(e) => {
-          if (e.key === "Enter") {
-            search(inputRef.current.value);
-          }
-        }}
-         />
-        <img 
-        src={search_icon} 
-        alt="search icon" 
-        onClick={() => search(inputRef.current.value)}/>
+        <input ref={cityRef} type="text" placeholder="Enter City Name" onKeyDown={(e) => { if (e.key === "Enter") search(); }} />
+        <input ref={stateRef} type="text" placeholder="State (Optional)" maxLength={2} onKeyDown={(e) => { if (e.key === "Enter") search(); }} />
+ 
+        <img src={search_icon} alt="search icon" onClick={search} />
       </div>
       {weatherData.temperature !== null ? (
         <>

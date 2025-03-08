@@ -11,19 +11,19 @@
   .search-bar {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 16px;
 
   }
 
   .search-bar input {
-    height: 50px;
+    height: 60px;
     border: none;
     outline: none;
     border-radius: 40px;
-    padding-left: 25px;
+    padding-left: 30px;
     color:#524632;
-    background: #ebfffc;
-    font-size: 18px;
+    background: hsl(171, 100%, 96%);
+    font-size: 20px;
   }
 
   .search-bar img {
